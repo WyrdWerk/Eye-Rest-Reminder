@@ -1,6 +1,6 @@
 {
   "name": "eye-rest-reminder",
-  "version": "1.1.6",
+  "version": "1.0.0",
   "description": "Desktop eye rest reminder — schedules, tray, notifications, and synthesized reminder tones.",
   "main": "dist/main.js",
   "repository": {
@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/WyrdWerk/Eye-Rest-Reminder/issues"
   },
-  "author": "",
+  "author": "WyrdWerk",
   "scripts": {
     "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:main\"",
     "dev:renderer": "webpack serve --mode development",

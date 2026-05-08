@@ -4,20 +4,22 @@ A desktop application that reminds you to take regular breaks from screen time t
 
 ## Download
 
-Get the latest published release for your platform from [Releases](https://github.com/WyrdWerk/Eye-Rest-Reminder/releases):
+Get the latest release for your platform from the [Releases](https://github.com/WyrdWerk/Eye-Rest-Reminder/releases) page:
 
-- **Windows**: Download `Eye Rest Reminder-Setup-X.Y.Z.exe`
-- **Linux**: Download `Eye Rest Reminder-X.X.X-arm64.AppImage`
+- **Windows**: Download the `.exe` installer
+- **Linux**: Download the `.AppImage`
 
-Current published release: `v1.1.6`
+## Current Status
 
-Note: `v1.1.6` keeps the reminder fixes from `v1.1.5` and refreshes the app UI with a cleaner light layout.
+This is **v1.0.0** — the initial stable release. All features described below are available from this baseline version.
+
+For a history of changes and new features in future releases, see the [CHANGELOG.md](./CHANGELOG.md).
 
 ## Features
 
 - **Multiple Reminder Schedules**: Configure different schedules for different times of day
 - **Customizable Intervals**: Set how often you want to be reminded (default: every 20 minutes)
-- **Configurable Rest Duration**: Set how long each reminder lasts (5-300 seconds, default 20 seconds)
+- **Configurable Rest Duration**: Set how long each reminder lasts (5–300 seconds, default 20 seconds)
 - **Audio Modes**: Choose between a single notification sound or repeating audio for the full rest duration
 - **System Notifications**: Optional OS-level notifications (Windows toast / Linux notifications)
 - **Volume & Mute Controls**: Adjust reminder volume or mute entirely
@@ -49,12 +51,6 @@ When a reminder fires:
 3. Audio plays according to the selected mode
 4. Click "I have rested" to dismiss early (stops audio immediately)
 
-## Current status
-
-- `v1.1.4` fixed the packaged startup / white-screen issue.
-- `v1.1.5` added the reminder notification hotfix.
-- `v1.1.6` refreshes the UI and is the current stable release.
-
 ## Development
 
 ### Prerequisites
@@ -67,7 +63,7 @@ When a reminder fires:
 ```bash
 # Clone the repository
 git clone https://github.com/WyrdWerk/Eye-Rest-Reminder.git
-cd eye-rest-reminder
+cd Eye-Rest-Reminder
 
 # Install dependencies
 npm install
@@ -135,7 +131,7 @@ tests/
 This project uses GitHub Actions to automatically build installers for Windows and Linux:
 
 - Every push to `master` branch runs tests
-- Creating a tag (for example `v1.1.4`) triggers full builds and creates a GitHub Release
+- Creating a tag (for example `v1.0.0`) triggers full builds and creates a GitHub Release
 - Download artifacts from the [Releases page](https://github.com/WyrdWerk/Eye-Rest-Reminder/releases)
 
 ## License
