@@ -1,0 +1,90 @@
+.reminder-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(17, 17, 17, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reminder-content {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: var(--shadow-elevated);
+  padding: 32px 36px;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+}
+
+.reminder-header h2 {
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  line-height: 30px;
+  color: var(--text-primary);
+}
+
+.reminder-schedule-name {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--text-tertiary);
+}
+
+.reminder-countdown {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 20px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.reminder-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--border-subtle);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.reminder-progress-fill {
+  height: 100%;
+  background: var(--accent-primary);
+  border-radius: 999px;
+  transition: width 1s linear;
+}
+
+.reminder-hint {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.reminder-dismiss-btn {
+  height: 40px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent-primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.reminder-dismiss-btn:hover {
+  background: var(--accent-hover);
+}
