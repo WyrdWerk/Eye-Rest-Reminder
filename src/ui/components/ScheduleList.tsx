@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Schedule } from '../../core/types';
 import './ScheduleList.css';
 
@@ -10,13 +10,28 @@ interface ScheduleListProps {
   onAdd: () => void;
 }
 
-const ScheduleList: React.FC<ScheduleListProps> = ({
+const ScheduleList: React.FC<ScheduleListProps> = React.memo(({
   schedules,
   onEdit,
   onDelete,
   onToggle,
   onAdd,
 }) => {
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  const handleDeleteClick = (id: string) => {
+    setConfirmDeleteId(id);
+  };
+
+  const handleDeleteConfirm = (id: string) => {
+    onDelete(id);
+    setConfirmDeleteId(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setConfirmDeleteId(null);
+  };
+
   if (schedules.length === 0) {
     return (
       <div className="schedule-screen schedule-screen-empty">
@@ -78,7 +93,10 @@ const ScheduleList: React.FC<ScheduleListProps> = ({
               </div>
 
               <div className="schedule-actions">
-                <label className="toggle-switch" aria-label={schedule.enabled ? 'Turn off' : 'Turn on'}>
+                <label
+                  className="toggle-switch"
+                  aria-label={`${schedule.enabled ? 'Disable' : 'Enable'} ${schedule.name}`}
+                >
                   <input
                     type="checkbox"
                     checked={schedule.enabled}
@@ -89,27 +107,40 @@ const ScheduleList: React.FC<ScheduleListProps> = ({
                 <button className="schedule-action-link" onClick={() => onEdit(schedule)}>
                   Edit
                 </button>
-                <button
-                  className="schedule-action-link schedule-action-danger"
-                  onClick={() => onDelete(schedule.id)}
-                >
-                  Delete
-                </button>
+                {confirmDeleteId === schedule.id ? (
+                  <span className="delete-confirm">
+                    <button
+                      className="schedule-action-link schedule-action-danger"
+                      onClick={() => handleDeleteConfirm(schedule.id)}
+                      aria-label={`Confirm delete ${schedule.name}`}
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      className="schedule-action-link"
+                      onClick={handleDeleteCancel}
+                    >
+                      Cancel
+                    </button>
+                  </span>
+                ) : (
+                  <button
+                    className="schedule-action-link schedule-action-danger"
+                    onClick={() => handleDeleteClick(schedule.id)}
+                    aria-label={`Delete ${schedule.name}`}
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           </div>
         ))}
       </div>
-
-      <div className="quick-tests">
-        <div className="quick-tests-label">Quick tests</div>
-        <div className="quick-tests-note">
-          Use these to verify the reminder UI and audio without waiting for a
-          schedule boundary.
-        </div>
-      </div>
     </div>
   );
-};
+});
+
+ScheduleList.displayName = 'ScheduleList';
 
 export default ScheduleList;

@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppSettings, AudioMode } from '../../core/types';
+import { MIN_REMINDER_DURATION_S, MAX_REMINDER_DURATION_S } from '../../constants';
 import './AudioSettings.css';
 
 interface AudioSettingsProps {
@@ -7,7 +8,9 @@ interface AudioSettingsProps {
   onUpdate: (partial: Partial<AppSettings>) => void;
 }
 
-const AudioSettings: React.FC<AudioSettingsProps> = ({ settings, onUpdate }) => {
+const AUDIO_MODES: AudioMode[] = ['single', 'repeat_for_duration'];
+
+const AudioSettings: React.FC<AudioSettingsProps> = React.memo(({ settings, onUpdate }) => {
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate({ volume: parseInt(e.target.value, 10) });
   };
@@ -18,13 +21,16 @@ const AudioSettings: React.FC<AudioSettingsProps> = ({ settings, onUpdate }) => 
 
   const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value, 10);
-    if (!isNaN(val) && val >= 5 && val <= 300) {
+    if (!isNaN(val) && val >= MIN_REMINDER_DURATION_S && val <= MAX_REMINDER_DURATION_S) {
       onUpdate({ reminderDurationSeconds: val });
     }
   };
 
   const handleAudioModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onUpdate({ audioMode: e.target.value as AudioMode });
+    const value = e.target.value;
+    if ((AUDIO_MODES as string[]).includes(value)) {
+      onUpdate({ audioMode: value as AudioMode });
+    }
   };
 
   const handleSystemNotificationToggle = () => {
@@ -49,8 +55,8 @@ const AudioSettings: React.FC<AudioSettingsProps> = ({ settings, onUpdate }) => 
             <input
               id="reminder-duration"
               type="number"
-              min={5}
-              max={300}
+              min={MIN_REMINDER_DURATION_S}
+              max={MAX_REMINDER_DURATION_S}
               value={settings.reminderDurationSeconds}
               onChange={handleDurationChange}
             />
@@ -92,6 +98,7 @@ const AudioSettings: React.FC<AudioSettingsProps> = ({ settings, onUpdate }) => 
               value={settings.muted ? 0 : settings.volume}
               onChange={handleVolumeChange}
               disabled={settings.muted}
+              aria-label={`Volume: ${settings.muted ? 'Muted' : `${settings.volume}%`}`}
               style={{
                 ['--volume-fill' as string]: settings.muted ? 0 : settings.volume,
               }}
@@ -103,6 +110,7 @@ const AudioSettings: React.FC<AudioSettingsProps> = ({ settings, onUpdate }) => 
               type="checkbox"
               checked={settings.muted}
               onChange={handleMuteToggle}
+              aria-label="Mute audio"
             />
             <span>Mute</span>
           </label>
@@ -117,6 +125,7 @@ const AudioSettings: React.FC<AudioSettingsProps> = ({ settings, onUpdate }) => 
               type="checkbox"
               checked={settings.showSystemNotification}
               onChange={handleSystemNotificationToggle}
+              aria-label="Show system notifications"
             />
             <span>Show system notifications</span>
           </label>
@@ -127,6 +136,8 @@ const AudioSettings: React.FC<AudioSettingsProps> = ({ settings, onUpdate }) => 
       </section>
     </div>
   );
-};
+});
+
+AudioSettings.displayName = 'AudioSettings';
 
 export default AudioSettings;

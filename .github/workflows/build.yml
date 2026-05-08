@@ -14,8 +14,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
       - run: npm ci
-      - run: npm test
+      - run: npm run typecheck
+      - run: npm test -- --coverage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: ignore
 
   build:
     needs: test
@@ -32,6 +39,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
       - run: npm ci
       - run: npm run build
       # Do not set GH_TOKEN here: electron-builder would try to create/publish a

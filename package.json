@@ -20,6 +20,10 @@
     "build:renderer": "webpack --mode production",
     "build:main": "tsc",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist release coverage",
     "start": "electron .",
     "dist": "npm run build && electron-builder"
   },
@@ -29,6 +33,9 @@
     "desktop",
     "electron"
   ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.11",
@@ -51,7 +58,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
-    "electron-store": "7.0.3",
+    "electron-store": "^7.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

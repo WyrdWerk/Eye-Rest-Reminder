@@ -18,7 +18,7 @@
 }
 
 .reminder-content {
-  background: #ffffff;
+  background: var(--surface-bg-pure);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
   box-shadow: var(--shadow-elevated);

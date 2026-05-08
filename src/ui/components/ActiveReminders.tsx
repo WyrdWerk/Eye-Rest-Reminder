@@ -47,13 +47,21 @@ const ActiveReminders: React.FC = () => {
 
   if (!reminder || !reminder.active) return null;
 
-  const progressPercent =
-    ((reminder.totalDurationSeconds - reminder.remainingSeconds) /
-      reminder.totalDurationSeconds) *
-    100;
+  const progressPercent = Math.min(
+    100,
+    Math.max(
+      0,
+      ((reminder.totalDurationSeconds - reminder.remainingSeconds) / reminder.totalDurationSeconds) * 100
+    )
+  );
 
   return (
-    <div className="reminder-overlay">
+    <div
+      className="reminder-overlay"
+      role="alertdialog"
+      aria-live="assertive"
+      aria-label="Eye rest reminder"
+    >
       <div className="reminder-content">
         <div className="reminder-header">
           <h2>Time to Rest!</h2>
@@ -69,7 +77,11 @@ const ActiveReminders: React.FC = () => {
         <p className="reminder-hint">
           Look away from the screen and focus on something 20+ feet away
         </p>
-        <button className="reminder-dismiss-btn" onClick={handleDismiss}>
+        <button
+          className="reminder-dismiss-btn"
+          onClick={handleDismiss}
+          aria-label="Dismiss reminder"
+        >
           I have rested
         </button>
       </div>

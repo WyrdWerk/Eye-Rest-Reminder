@@ -89,7 +89,7 @@
 }
 
 .schedule-item.disabled {
-  background: #fcfcfc;
+  background: var(--surface-bg-subtle);
 }
 
 .schedule-card-main {
@@ -168,7 +168,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--surface-bg-pure);
   box-shadow: 0 1px 3px rgba(17, 17, 17, 0.14);
   transition: transform 0.2s ease;
 }
@@ -182,7 +182,7 @@
 }
 
 .toggle-switch input:focus-visible + .toggle-slider {
-  outline: 2px solid rgba(63, 94, 114, 0.25);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -209,27 +209,6 @@
   color: var(--danger-hover);
 }
 
-.quick-tests {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.quick-tests-label {
-  font-size: 12px;
-  line-height: 18px;
-  font-weight: 500;
-  color: var(--text-tertiary);
-}
-
-.quick-tests-note {
-  font-size: 14px;
-  line-height: 22px;
-  color: var(--text-secondary);
-  max-width: 560px;
-}
 
 @media (max-width: 720px) {
   .page-header-row,

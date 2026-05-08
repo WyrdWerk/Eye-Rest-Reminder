@@ -1,0 +1,17 @@
+export const IPC = {
+  GET_SETTINGS: 'get-settings',
+  SAVE_SETTINGS: 'save-settings',
+  GET_SCHEDULES: 'get-schedules',
+  SAVE_SCHEDULES: 'save-schedules',
+  GET_ACTIVE_REMINDER: 'get-active-reminder',
+  DISMISS_REMINDER: 'dismiss-reminder',
+  TEST_REMINDER: 'test-reminder',
+  TEST_SOUND: 'test-sound',
+  RENDERER_READY: 'renderer-ready',
+  PLAY_SOUND: 'play-sound',
+  STOP_SOUND: 'stop-sound',
+  REMINDER_STARTED: 'reminder-started',
+  REMINDER_TICK: 'reminder-tick',
+  REMINDER_DISMISSED: 'reminder-dismissed',
+  SETTINGS_UPDATED: 'settings-updated',
+} as const;

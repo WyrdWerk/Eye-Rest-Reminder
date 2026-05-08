@@ -1,5 +1,3 @@
-// Core shared types for Eye Rest Reminder
-
 export interface Schedule {
   id: string;
   name: string;
@@ -7,27 +5,6 @@ export interface Schedule {
   endTime: string; // HH:mm format
   intervalMinutes: number;
   enabled: boolean;
-}
-
-// Legacy alias kept so the scheduler and main-process flow share one schedule shape.
-export type ReminderSchedule = Schedule;
-
-export interface ReminderEvent {
-  scheduleId: string;
-  scheduledTime: Date;
-}
-
-export interface SchedulerState {
-  schedules: ReminderSchedule[];
-  nextReminder: ReminderEvent | null;
-  activeReminder: ReminderEvent | null;
-  isMuted: boolean;
-  volume: number;
-}
-
-export interface ValidationResult {
-  valid: boolean;
-  errors: string[];
 }
 
 export type AudioMode = 'single' | 'repeat_for_duration';

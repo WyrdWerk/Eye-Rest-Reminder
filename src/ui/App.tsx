@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { AppSettings, DEFAULT_SETTINGS, Schedule, AudioMode } from '../core/types';
+import { useState, useEffect, useCallback } from 'react';
+import { AppSettings, DEFAULT_SETTINGS, Schedule } from '../core/types';
 import ActiveReminders from './components/ActiveReminders';
 import ScheduleList from './components/ScheduleList';
 import ScheduleForm from './components/ScheduleForm';
@@ -10,6 +10,7 @@ const electron = window.electronAPI;
 
 function App() {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [isLoading, setIsLoading] = useState(true);
   const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | undefined>(undefined);
   const [activeView, setActiveView] = useState<'schedules' | 'settings'>('schedules');
@@ -20,6 +21,8 @@ function App() {
       setSettings(loaded);
     } catch (err) {
       console.error('Failed to load settings:', err);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -120,46 +123,54 @@ function App() {
         </div>
       </nav>
 
-      {activeView === 'schedules' && (
-        <div className="app-content app-content-schedules">
-          {showScheduleForm ? (
-            <ScheduleForm
-              schedule={editingSchedule}
-              onSave={handleSaveSchedule}
-              onCancel={() => {
-                setShowScheduleForm(false);
-                setEditingSchedule(undefined);
-              }}
-            />
-          ) : (
-            <>
-              <ScheduleList
-                schedules={settings.schedules}
-                onEdit={handleEditSchedule}
-                onDelete={handleDeleteSchedule}
-                onToggle={handleToggleSchedule}
-                onAdd={handleAddSchedule}
-              />
-              <div className="test-controls">
-                <button className="btn-test" onClick={handleTestReminder}>
-                  Test Reminder
-                </button>
-                <button className="btn-test" onClick={handleTestSound}>
-                  Test Sound
-                </button>
-              </div>
-            </>
+      {isLoading ? (
+        <div className="app-content app-loading">
+          <span className="loading-indicator" aria-label="Loading…" />
+        </div>
+      ) : (
+        <>
+          {activeView === 'schedules' && (
+            <div className="app-content app-content-schedules">
+              {showScheduleForm ? (
+                <ScheduleForm
+                  schedule={editingSchedule}
+                  onSave={handleSaveSchedule}
+                  onCancel={() => {
+                    setShowScheduleForm(false);
+                    setEditingSchedule(undefined);
+                  }}
+                />
+              ) : (
+                <>
+                  <ScheduleList
+                    schedules={settings.schedules}
+                    onEdit={handleEditSchedule}
+                    onDelete={handleDeleteSchedule}
+                    onToggle={handleToggleSchedule}
+                    onAdd={handleAddSchedule}
+                  />
+                  <div className="test-controls">
+                    <button className="btn-test" onClick={handleTestReminder}>
+                      Test Reminder
+                    </button>
+                    <button className="btn-test" onClick={handleTestSound}>
+                      Test Sound
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           )}
-        </div>
-      )}
 
-      {activeView === 'settings' && (
-        <div className="app-content app-content-settings">
-          <AudioSettings
-            settings={settings}
-            onUpdate={handleUpdateSettings}
-          />
-        </div>
+          {activeView === 'settings' && (
+            <div className="app-content app-content-settings">
+              <AudioSettings
+                settings={settings}
+                onUpdate={handleUpdateSettings}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

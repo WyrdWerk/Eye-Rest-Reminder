@@ -1,62 +1,64 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import { IPC } from './ipc-channels';
+import type { AppSettings, Schedule, ReminderState } from './core/types';
 
 export interface ElectronAPI {
-  getSettings(): Promise<import('./core/types').AppSettings>;
-  saveSettings(settings: Partial<import('./core/types').AppSettings>): Promise<import('./core/types').AppSettings>;
-  getSchedules(): Promise<import('./core/types').Schedule[]>;
-  saveSchedules(schedules: import('./core/types').Schedule[]): Promise<import('./core/types').Schedule[]>;
-  getActiveReminder(): Promise<import('./core/types').ReminderState>;
+  getSettings(): Promise<AppSettings>;
+  saveSettings(settings: Partial<AppSettings>): Promise<AppSettings>;
+  getSchedules(): Promise<Schedule[]>;
+  saveSchedules(schedules: Schedule[]): Promise<Schedule[]>;
+  getActiveReminder(): Promise<ReminderState>;
   dismissReminder(): Promise<boolean>;
   testReminder(): Promise<boolean>;
   testSound(): Promise<boolean>;
   rendererReady(): void;
-  onReminderStarted(callback: (state: import('./core/types').ReminderState) => void): () => void;
+  onReminderStarted(callback: (state: ReminderState) => void): () => void;
   onReminderTick(callback: (remaining: number) => void): () => void;
   onReminderDismissed(callback: () => void): () => void;
-  onSettingsUpdated(callback: (settings: import('./core/types').AppSettings) => void): () => void;
+  onSettingsUpdated(callback: (settings: AppSettings) => void): () => void;
   onPlaySound(callback: (opts: { volume: number }) => void): () => void;
   onStopSound(callback: () => void): () => void;
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  getSettings: () => ipcRenderer.invoke('get-settings'),
-  saveSettings: (settings: any) => ipcRenderer.invoke('save-settings', settings),
-  getSchedules: () => ipcRenderer.invoke('get-schedules'),
-  saveSchedules: (schedules: any) => ipcRenderer.invoke('save-schedules', schedules),
-  getActiveReminder: () => ipcRenderer.invoke('get-active-reminder'),
-  dismissReminder: () => ipcRenderer.invoke('dismiss-reminder'),
-  testReminder: () => ipcRenderer.invoke('test-reminder'),
-  testSound: () => ipcRenderer.invoke('test-sound'),
-  rendererReady: () => ipcRenderer.send('renderer-ready'),
+  getSettings: () => ipcRenderer.invoke(IPC.GET_SETTINGS),
+  saveSettings: (settings: Partial<AppSettings>) => ipcRenderer.invoke(IPC.SAVE_SETTINGS, settings),
+  getSchedules: () => ipcRenderer.invoke(IPC.GET_SCHEDULES),
+  saveSchedules: (schedules: Schedule[]) => ipcRenderer.invoke(IPC.SAVE_SCHEDULES, schedules),
+  getActiveReminder: () => ipcRenderer.invoke(IPC.GET_ACTIVE_REMINDER),
+  dismissReminder: () => ipcRenderer.invoke(IPC.DISMISS_REMINDER),
+  testReminder: () => ipcRenderer.invoke(IPC.TEST_REMINDER),
+  testSound: () => ipcRenderer.invoke(IPC.TEST_SOUND),
+  rendererReady: () => ipcRenderer.send(IPC.RENDERER_READY),
 
-  onReminderStarted: (callback: any) => {
-    const handler = (_event: any, state: any) => callback(state);
-    ipcRenderer.on('reminder-started', handler);
-    return () => ipcRenderer.removeListener('reminder-started', handler);
+  onReminderStarted: (callback: (state: ReminderState) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, state: ReminderState) => callback(state);
+    ipcRenderer.on(IPC.REMINDER_STARTED, handler);
+    return () => ipcRenderer.removeListener(IPC.REMINDER_STARTED, handler);
   },
-  onReminderTick: (callback: any) => {
-    const handler = (_event: any, remaining: number) => callback(remaining);
-    ipcRenderer.on('reminder-tick', handler);
-    return () => ipcRenderer.removeListener('reminder-tick', handler);
+  onReminderTick: (callback: (remaining: number) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, remaining: number) => callback(remaining);
+    ipcRenderer.on(IPC.REMINDER_TICK, handler);
+    return () => ipcRenderer.removeListener(IPC.REMINDER_TICK, handler);
   },
-  onReminderDismissed: (callback: any) => {
+  onReminderDismissed: (callback: () => void) => {
     const handler = () => callback();
-    ipcRenderer.on('reminder-dismissed', handler);
-    return () => ipcRenderer.removeListener('reminder-dismissed', handler);
+    ipcRenderer.on(IPC.REMINDER_DISMISSED, handler);
+    return () => ipcRenderer.removeListener(IPC.REMINDER_DISMISSED, handler);
   },
-  onSettingsUpdated: (callback: any) => {
-    const handler = (_event: any, settings: any) => callback(settings);
-    ipcRenderer.on('settings-updated', handler);
-    return () => ipcRenderer.removeListener('settings-updated', handler);
+  onSettingsUpdated: (callback: (settings: AppSettings) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, settings: AppSettings) => callback(settings);
+    ipcRenderer.on(IPC.SETTINGS_UPDATED, handler);
+    return () => ipcRenderer.removeListener(IPC.SETTINGS_UPDATED, handler);
   },
-  onPlaySound: (callback: any) => {
-    const handler = (_event: any, opts: any) => callback(opts);
-    ipcRenderer.on('play-sound', handler);
-    return () => ipcRenderer.removeListener('play-sound', handler);
+  onPlaySound: (callback: (opts: { volume: number }) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, opts: { volume: number }) => callback(opts);
+    ipcRenderer.on(IPC.PLAY_SOUND, handler);
+    return () => ipcRenderer.removeListener(IPC.PLAY_SOUND, handler);
   },
-  onStopSound: (callback: any) => {
+  onStopSound: (callback: () => void) => {
     const handler = () => callback();
-    ipcRenderer.on('stop-sound', handler);
-    return () => ipcRenderer.removeListener('stop-sound', handler);
+    ipcRenderer.on(IPC.STOP_SOUND, handler);
+    return () => ipcRenderer.removeListener(IPC.STOP_SOUND, handler);
   },
-});
+} satisfies ElectronAPI);

@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import Store from 'electron-store';
 import { Schedule, AppSettings, DEFAULT_SETTINGS } from '../core/types';
+import { IPC } from '../ipc-channels';
+import { MIN_REMINDER_DURATION_S, MAX_REMINDER_DURATION_S } from '../constants';
 import { logMain } from '../logger';
 
 type AppStore = Store<AppSettings> & {
@@ -81,7 +83,7 @@ export function saveSettings(settings: Partial<AppSettings>): AppSettings {
   if (settings.volume !== undefined) currentStore.set('volume', settings.volume);
   if (settings.muted !== undefined) currentStore.set('muted', settings.muted);
   if (settings.reminderDurationSeconds !== undefined) {
-    const clamped = Math.max(5, Math.min(300, Math.round(settings.reminderDurationSeconds)));
+    const clamped = Math.max(MIN_REMINDER_DURATION_S, Math.min(MAX_REMINDER_DURATION_S, Math.round(settings.reminderDurationSeconds)));
     currentStore.set('reminderDurationSeconds', clamped);
   }
   if (settings.audioMode !== undefined) currentStore.set('audioMode', settings.audioMode);
@@ -89,22 +91,28 @@ export function saveSettings(settings: Partial<AppSettings>): AppSettings {
   return getSettings();
 }
 
+function broadcast(mainWindow: BrowserWindow, channel: string, payload?: unknown): void {
+  if (!mainWindow.isDestroyed()) {
+    mainWindow.webContents.send(channel, payload);
+  }
+}
+
 export function registerStoreHandlers(mainWindow: BrowserWindow): void {
   ensureStoreReady();
 
-  ipcMain.handle('get-settings', () => getSettings());
+  ipcMain.handle(IPC.GET_SETTINGS, () => getSettings());
 
-  ipcMain.handle('save-settings', (_event, settings: Partial<AppSettings>) => {
+  ipcMain.handle(IPC.SAVE_SETTINGS, (_event, settings: Partial<AppSettings>) => {
     const updated = saveSettings(settings);
-    mainWindow.webContents.send('settings-updated', updated);
+    broadcast(mainWindow, IPC.SETTINGS_UPDATED, updated);
     return updated;
   });
 
-  ipcMain.handle('get-schedules', () => getSchedules());
+  ipcMain.handle(IPC.GET_SCHEDULES, () => getSchedules());
 
-  ipcMain.handle('save-schedules', (_event, schedules: Schedule[]) => {
+  ipcMain.handle(IPC.SAVE_SCHEDULES, (_event, schedules: Schedule[]) => {
     saveSchedules(schedules);
-    mainWindow.webContents.send('settings-updated', getSettings());
+    broadcast(mainWindow, IPC.SETTINGS_UPDATED, getSettings());
     return getSchedules();
   });
 }

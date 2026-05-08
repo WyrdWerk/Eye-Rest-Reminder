@@ -1,4 +1,4 @@
-import { SchedulerCore, calculateNextReminder } from '../../src/core/scheduler';
+import { calculateNextReminder } from '../../src/core/scheduler';
 import { DEFAULT_SETTINGS, Schedule } from '../../src/core/types';
 
 function makeSchedule(overrides: Partial<Schedule> = {}): Schedule {
@@ -64,29 +64,22 @@ describe('calculateNextReminder', () => {
     const event = calculateNextReminder([s1, s2], now);
     expect(event).toMatchObject({ type: 'wait', scheduleId: 's1' });
   });
-});
 
-describe('SchedulerCore', () => {
-  test('computes the next reminder boundary for a schedule inside its window', () => {
-    const scheduler = new SchedulerCore();
-    const event = scheduler.computeNextReminder(
-      makeSchedule({ startTime: '08:00', endTime: '18:00', intervalMinutes: 60 }),
-      atTime(9, 30, 0)
-    );
-
-    expect(event?.scheduleId).toBe('test-schedule');
-    expect(event?.scheduledTime.getHours()).toBe(10);
-    expect(event?.scheduledTime.getMinutes()).toBe(0);
+  test('returns null for an empty schedule list', () => {
+    const event = calculateNextReminder([], atTime(9, 0, 0));
+    expect(event).toBeNull();
   });
 
-  test('validates end time after start time', () => {
-    const scheduler = new SchedulerCore();
-    const result = scheduler.validateSchedule(
-      makeSchedule({ startTime: '18:00', endTime: '08:00' })
-    );
+  test('fires at exact start time if it aligns with the interval', () => {
+    const schedule = makeSchedule({ startTime: '09:00', endTime: '18:00', intervalMinutes: 60 });
+    const event = calculateNextReminder([schedule], atTime(9, 0, 0));
+    expect(event).toEqual({ type: 'fire', scheduleId: 'test-schedule' });
+  });
 
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContain('End time must be after start time');
+  test('returns null when now is exactly at end time', () => {
+    const schedule = makeSchedule({ startTime: '08:00', endTime: '10:00', intervalMinutes: 60 });
+    const event = calculateNextReminder([schedule], atTime(10, 0, 0));
+    expect(event).toBeNull();
   });
 });
 
