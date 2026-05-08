@@ -6,7 +6,7 @@ module.exports = (env, argv) => {
 
   return {
     entry: './src/ui/index.tsx',
-    target: 'electron-renderer',
+    target: 'web',
     devtool: isProd ? 'source-map' : 'cheap-module-source-map',
     module: {
       rules: [
@@ -27,6 +27,9 @@ module.exports = (env, argv) => {
     output: {
       filename: 'bundle.js',
       path: path.resolve(__dirname, 'dist'),
+      // Electron renderer runs in a browser-like sandbox where HMR should use
+      // `self`, not Node's `global`.
+      globalObject: 'self',
     },
     plugins: [
       new HtmlWebpackPlugin({

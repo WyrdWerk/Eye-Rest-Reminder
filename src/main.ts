@@ -3,17 +3,16 @@ import {
   BrowserWindow,
   Tray,
   Menu,
-  ipcMain,
   nativeImage,
 } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import { ensureStoreReady, registerStoreHandlers, getSettings } from './storage/store';
+import { ensureStoreReady, getSettings } from './storage/store';
 import { calculateNextReminder } from './core/scheduler';
-import { IPC } from './ipc-channels';
 import { WINDOW_WIDTH, WINDOW_HEIGHT, SCHEDULER_POLL_INTERVAL_MS, REMINDER_DUE_SOON_THRESHOLD_MS, MINUTE_BUCKET_MS } from './constants';
 import { ReminderManager } from './reminder-manager';
 import { getMainLogFilePath, logMain } from './logger';
+import { registerMainIpcHandlersWithDefaults } from './main-ipc';
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -185,34 +184,7 @@ function startScheduler(): void {
 
 function registerIpcHandlers(): void {
   if (!mainWindow) return;
-
-  registerStoreHandlers(mainWindow);
-
-  ipcMain.handle(IPC.GET_ACTIVE_REMINDER, () => reminder.getState());
-
-  ipcMain.handle(IPC.DISMISS_REMINDER, () => {
-    if (mainWindow) reminder.dismiss(mainWindow);
-    return true;
-  });
-
-  ipcMain.handle(IPC.TEST_REMINDER, () => {
-    triggerTestReminder();
-    return true;
-  });
-
-  ipcMain.handle(IPC.TEST_SOUND, () => {
-    const settings = getSettings();
-    if (!settings.muted && mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send(IPC.PLAY_SOUND, { volume: settings.volume / 100 });
-    }
-    return true;
-  });
-
-  ipcMain.on(IPC.RENDERER_READY, () => {
-    if (reminder.isActive() && mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send(IPC.REMINDER_STARTED, reminder.getState());
-    }
-  });
+  registerMainIpcHandlersWithDefaults(mainWindow, reminder, triggerTestReminder);
 }
 
 app.whenReady().then(() => {

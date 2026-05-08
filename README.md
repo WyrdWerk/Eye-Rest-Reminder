@@ -81,6 +81,17 @@ npm run build
 npm run dist
 ```
 
+### Manual Smoke Checklist
+
+After `npm run dev`, verify the Electron-only behaviors that unit tests do not fully cover:
+
+1. Click `Test Sound` with audio enabled and confirm you hear one beep without opening the reminder overlay.
+2. Enable `Mute`, click `Test Sound`, and confirm no audio plays.
+3. Click `Test Reminder` and confirm the overlay appears, the countdown decrements each second, and `I have rested` dismisses it immediately.
+4. Toggle audio mode and system notification settings, then run `Test Reminder` again to confirm the behavior matches the selected settings.
+5. While a reminder is active, reload the renderer window and confirm the reminder state is restored instead of disappearing.
+6. Change schedules or settings, restart the app, and confirm the updated values persist.
+
 ## Architecture
 
 ```
