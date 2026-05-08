@@ -1,6 +1,6 @@
 {
   "name": "eye-rest-reminder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Desktop eye rest reminder — schedules, tray, notifications, and synthesized reminder tones.",
   "main": "dist/main.js",
   "repository": {
