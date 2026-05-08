@@ -1,0 +1,82 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm test
+
+  build:
+    needs: test
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: win
+          - os: ubuntu-latest
+            artifact: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run build
+      # Do not set GH_TOKEN here: electron-builder would try to create/publish a
+      # release on tag builds, which fails with 403 for GITHUB_TOKEN and duplicates
+      # the dedicated release job below (softprops/action-gh-release).
+      - run: npm run dist
+      - name: Show build outputs
+        shell: bash
+        run: |
+          ls -la || true
+          ls -la dist || true
+          ls -la release || true
+          if [ -d release ]; then
+            find release -maxdepth 3 -type f | sort || true
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}-installer
+          if-no-files-found: error
+          path: |
+            release/*.exe
+            release/*.AppImage
+            release/**/*.exe
+            release/**/*.AppImage
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Show downloaded artifacts
+        run: |
+          ls -la artifacts || true
+          find artifacts -maxdepth 4 -type f | sort || true
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            artifacts/**/*.exe
+            artifacts/**/*.AppImage
